@@ -12,7 +12,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind(
+        App\Domain\Task\Repositories\ITaskRepository::class,
+        \App\Infrastructure\Task\EloquentTaskRepository::class,
+    );
     }
 
     /**
