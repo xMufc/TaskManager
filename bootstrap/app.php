@@ -29,4 +29,11 @@ return Application::configure(basePath: dirname(__DIR__))
             }
             return response()->json(['message' => $e->getMessage()], 422);
         });
+        $exceptions->render(function (TaskNotFoundException $e, $request) {
+            if ($request->header('X-Inertia')) {
+                return back()->withErrors(['task' => $e->getMessage()]);
+            }
+
+            return response()->json(['message' => $e->getMessage()], 404);
+        });
     })->create();

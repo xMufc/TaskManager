@@ -35,6 +35,8 @@ final class UpdateTaskStatusHandler
 
         $this->tasks->save($updated);
 
+        event(new TaskStatusChanged($updated, $task->status));
+
         return $updated;
     }
 }

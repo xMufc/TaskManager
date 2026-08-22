@@ -30,6 +30,8 @@ final class CreateTaskHandler
 
         $this->tasks->save($task);
 
+        event(new TaskCreated($task));
+
         return $task;
     }
 }
