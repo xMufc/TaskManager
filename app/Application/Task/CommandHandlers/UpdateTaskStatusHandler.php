@@ -7,12 +7,15 @@ use App\Domain\Task\Repositories\TaskRepository;
 use App\Domain\Task\Events\TaskStatusChanged;
 use App\Domain\Task\Exceptions\TaskNotFoundException;
 use App\Domain\Task\Models\Task;
-use App\Domain\Task\Rules\TaskStatusTransition;
+use Illuminate\Contracts\Events\Dispatcher;
+
+
 
 final class UpdateTaskStatusHandler
 {
     public function __construct(
         private readonly TaskRepository $tasks,
+        private Dispatcher $events,
     ) {
     }
 
@@ -21,7 +24,7 @@ final class UpdateTaskStatusHandler
         $task = $this->tasks->find($command->taskId, $command->userId)
             ?? throw TaskNotFoundException::withId($command->taskId);
             
-        TaskStatusTransition::assertAllowed($task->status, $command->newStatus);
+        $task->status->assertAllowed($task->status, $command->newStatus);
 
         $updated = new Task(
             id: $task->id,
@@ -35,7 +38,9 @@ final class UpdateTaskStatusHandler
 
         $this->tasks->save($updated);
 
-        event(new TaskStatusChanged($updated, $task->status));
+        $this->events->dispatch(
+            new TaskStatusChanged($updated, $task->status)
+        );
 
         return $updated;
     }

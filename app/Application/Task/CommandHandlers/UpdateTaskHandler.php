@@ -3,14 +3,17 @@
 namespace App\Application\Task\CommandHandlers;
 
 use App\Application\Task\Commands\UpdateTaskCommand;
-use App\Domain\Task\Contracts\TaskRepository;
+use App\Domain\Task\Repositories\TaskRepository;
+use App\Domain\Task\Events\TaskUpdated;
 use App\Domain\Task\Exceptions\TaskNotFoundException;
 use App\Domain\Task\Models\Task;
+use Illuminate\Contracts\Events\Dispatcher;
 
 final class UpdateTaskHandler
 {
     public function __construct(
         private readonly TaskRepository $tasks,
+        private readonly Dispatcher $events,
     ) {
     }
 
@@ -30,6 +33,10 @@ final class UpdateTaskHandler
         );
 
         $this->tasks->save($updated);
+
+        $this->events->dispatch(
+            new TaskUpdated($task, $updated)
+        );
 
         return $updated;
     }

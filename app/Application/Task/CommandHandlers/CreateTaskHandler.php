@@ -8,11 +8,13 @@ use App\Domain\Task\Enums\TaskStatus;
 use App\Domain\Task\Events\TaskCreated;
 use App\Domain\Task\Models\Task;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Events\Dispatcher;
 
 final class CreateTaskHandler
 {
     public function __construct(
         private readonly TaskRepository $tasks,
+        private Dispatcher $events,
     ) {
     }
 
@@ -30,7 +32,9 @@ final class CreateTaskHandler
 
         $this->tasks->save($task);
 
-        event(new TaskCreated($task));
+        $this->events->dispatch(
+            new TaskCreated($task)
+        );
 
         return $task;
     }

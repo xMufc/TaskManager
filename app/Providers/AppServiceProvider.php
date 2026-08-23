@@ -7,8 +7,12 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use App\Domain\Task\Events\TaskCreated;
 use App\Domain\Task\Events\TaskStatusChanged;
+use App\Domain\Task\Events\TaskUpdated;
+use App\Domain\Task\Events\TaskDeleted;
 use App\Domain\Task\Listeners\LogTaskCreated;
 use App\Domain\Task\Listeners\LogTaskStatusChanged;
+use App\Domain\Task\Listeners\LogTaskUpdated;
+use App\Domain\Task\Listeners\LogTaskDeleted;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-        App\Domain\Task\Repositories\ITaskRepository::class,
+        App\Domain\Task\Repositories\TaskRepository::class,
         \App\Infrastructure\Task\EloquentTaskRepository::class,
     );
     }
@@ -31,5 +35,7 @@ class AppServiceProvider extends ServiceProvider
         Vite::prefetch(concurrency: 3);
         Event::listen(TaskCreated::class, LogTaskCreated::class);
         Event::listen(TaskStatusChanged::class, LogTaskStatusChanged::class);
+        Event::listen(TaskUpdated::class, LogTaskUpdated::class);
+        Event::listen(TaskDeleted::class, LogTaskDeleted::class);
     }
 }

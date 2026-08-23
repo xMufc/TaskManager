@@ -29,7 +29,7 @@ final class TaskData extends Data
             status: $task->status,
             priority: $task->priority,
             dueDate: $task->dueDate?->format('Y-m-d'),
-            allowedNextStatuses: \App\Domain\Task\Rules\TaskStatusTransition::allowedNextStatuses($task->status),
+            allowedNextStatuses: $task->status->allowedTransitions(),
         );
     }
 }
