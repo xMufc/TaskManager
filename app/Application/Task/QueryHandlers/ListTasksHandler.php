@@ -4,6 +4,7 @@ namespace App\Application\Task\QueryHandlers;
 
 use App\Domain\Task\Repositories\TaskRepository;
 use App\Domain\Task\Models\Task;
+use App\Application\Task\Queries\ListTasksQuery;
 
 final class ListTasksHandler
 {

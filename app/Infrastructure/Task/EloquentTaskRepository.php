@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Task;
 
-use App\Domain\Task\Contracts\TaskRepository;
+use App\Domain\Task\Repositories\TaskRepository;
 use App\Domain\Task\Enums\TaskStatus;
 use App\Domain\Task\Models\Task as DomainTask;
 use App\Models\Task as EloquentTask;

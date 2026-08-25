@@ -12,7 +12,6 @@ final class LogTaskDeleted
         Log::info('Task deleted', [
             'task_id' => $event->task->id,
             'user_id' => $event->task->userId,
-            'title' => $event->task->title,
         ]);
     }
 }
