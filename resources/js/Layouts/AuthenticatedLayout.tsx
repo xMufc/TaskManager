@@ -33,6 +33,15 @@ export default function Authenticated({
                                 >
                                     Zadania
                                 </NavLink>
+                                <NavLink
+                                    href={route("imports.index")}
+                                    active={
+                                        route().current("imports.index") ||
+                                        route().current("imports.show")
+                                    }
+                                >
+                                    Historia importów
+                                </NavLink>
                             </div>
                         </div>
 

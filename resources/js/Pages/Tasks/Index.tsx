@@ -6,6 +6,7 @@ import { useTaskFilter } from "@/Hooks/useTaskFilter";
 import TaskFilterBar from "@/Components/molecules/TaskFilterBar";
 import TaskList from "@/Components/organisms/TaskList";
 import TaskFormModal from "@/Components/organisms/TaskFormModal";
+import TaskImportButton from "@/Components/organisms/TaskImportButton";
 
 interface Props {
     tasks: Task[];
@@ -42,13 +43,15 @@ export default function Index({ tasks, filters }: Props) {
                     <h2 className="text-xl font-semibold leading-tight text-gray-800">
                         Zadania
                     </h2>
-
-                    <button
-                        onClick={openCreate}
-                        className="ml-auto rounded-md bg-slate-800 px-4 py-2 text-sm text-white"
-                    >
-                        Nowe zadanie
-                    </button>
+                    <div className="ml-auto flex items-center gap-2">
+                        <TaskImportButton />
+                        <button
+                            onClick={openCreate}
+                            className="ml-auto rounded-md bg-slate-800 px-4 py-2 text-sm text-white"
+                        >
+                            Nowe zadanie
+                        </button>
+                    </div>
                 </div>
             }
         >
