@@ -4,11 +4,23 @@ use App\Application\Task\CommandHandlers\PruneTasksHandler;
 use App\Application\Task\Commands\PruneTasksCommand;
 use App\Domain\Task\Enums\TaskPriority;
 use App\Domain\Task\Enums\TaskStatus;
+use App\Domain\Task\Events\TasksPruned;
 use App\Domain\Task\Models\Task;
+use Illuminate\Contracts\Events\Dispatcher;
+use Mockery;
 use Tests\Unit\Application\Task\InMemoryTaskRepository;
 
 it('deletes tasks older than the given number of days', function () {
     $repository = new InMemoryTaskRepository;
+
+    $events = Mockery::mock(Dispatcher::class);
+    $events->shouldReceive('dispatch')
+        ->once()
+        ->withArgs(function (TasksPruned $event) {
+            expect($event->deletedCount)->toBe(1);
+
+            return true;
+        });
 
     $oldTask = new Task(
         id: 'old-task',
@@ -35,7 +47,7 @@ it('deletes tasks older than the given number of days', function () {
     $repository->save($oldTask);
     $repository->save($recentTask);
 
-    $handler = new PruneTasksHandler($repository);
+    $handler = new PruneTasksHandler($repository, $events);
 
     $deleted = $handler->handle(new PruneTasksCommand(
         olderThanDays: 7,
@@ -48,6 +60,15 @@ it('deletes tasks older than the given number of days', function () {
 
 it('deletes multiple tasks older than the given number of days', function () {
     $repository = new InMemoryTaskRepository;
+
+    $events = Mockery::mock(Dispatcher::class);
+    $events->shouldReceive('dispatch')
+        ->once()
+        ->withArgs(function (TasksPruned $event) {
+            expect($event->deletedCount)->toBe(3);
+
+            return true;
+        });
 
     $tasks = [
         new Task(
@@ -86,7 +107,7 @@ it('deletes multiple tasks older than the given number of days', function () {
         $repository->save($task);
     }
 
-    $handler = new PruneTasksHandler($repository);
+    $handler = new PruneTasksHandler($repository, $events);
 
     $deleted = $handler->handle(new PruneTasksCommand(
         olderThanDays: 7,
@@ -101,6 +122,15 @@ it('deletes multiple tasks older than the given number of days', function () {
 it('does not delete tasks newer than the threshold', function () {
     $repository = new InMemoryTaskRepository;
 
+    $events = Mockery::mock(Dispatcher::class);
+    $events->shouldReceive('dispatch')
+        ->once()
+        ->withArgs(function (TasksPruned $event) {
+            expect($event->deletedCount)->toBe(0);
+
+            return true;
+        });
+
     $task = new Task(
         id: 'recent-task',
         userId: 'user-1',
@@ -114,7 +144,7 @@ it('does not delete tasks newer than the threshold', function () {
 
     $repository->save($task);
 
-    $handler = new PruneTasksHandler($repository);
+    $handler = new PruneTasksHandler($repository, $events);
 
     $deleted = $handler->handle(new PruneTasksCommand(
         olderThanDays: 7,
@@ -126,7 +156,10 @@ it('does not delete tasks newer than the threshold', function () {
 
 it('throws an exception when olderThanDays is zero', function () {
     $repository = new InMemoryTaskRepository;
-    $handler = new PruneTasksHandler($repository);
+
+    $events = Mockery::mock(Dispatcher::class);
+
+    $handler = new PruneTasksHandler($repository, $events);
 
     expect(fn () => $handler->handle(new PruneTasksCommand(
         olderThanDays: 0,
@@ -138,7 +171,10 @@ it('throws an exception when olderThanDays is zero', function () {
 
 it('throws an exception when olderThanDays is negative', function () {
     $repository = new InMemoryTaskRepository;
-    $handler = new PruneTasksHandler($repository);
+
+    $events = Mockery::mock(Dispatcher::class);
+
+    $handler = new PruneTasksHandler($repository, $events);
 
     expect(fn () => $handler->handle(new PruneTasksCommand(
         olderThanDays: -5,

@@ -1,59 +1,117 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# TaskManager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikacja do zarządzania zadaniami i asynchronicznego importu CSV, przygotowana w Laravel 13, React 18, TypeScript i Inertia. Środowisko uruchomieniowe zapewnia Laravel Sail (PHP 8.5, MySQL 8.4, Redis), a kolejkę importów obsługuje Laravel Horizon.
 
-## About Laravel
+## Wymagania
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- Docker z pluginem Docker Compose
+- Git
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+PHP, Composer, Node i bazy danych działają w kontenerach, więc nie trzeba instalować ich globalnie.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Uruchomienie
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+cp .env.example .env
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Wartości `DB_*` w `.env` domyślnie pasują do kontenerów Sail i nie trzeba ich zmieniać, chyba że istnieje potrzeba użycią innych danych.
 
-## Contributing
+```bash
+docker run --rm -u "$(id -u):$(id -g)" -v "$PWD":/app -w /app composer:2 composer install --ignore-platform-req=ext-pcntl
+./vendor/bin/sail up -d --build
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan migrate --seed
+./vendor/bin/sail npm install
+./vendor/bin/sail npm run build
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+Aplikacja jest dostępna pod `http://localhost`. Dane logowania po migracji z seederem: `test@example.com` / `password` (albo zarejestruj nowe konto przez `/register`).
 
-## Code of Conduct
+### Uruchomienie Horizon (kolejki, import CSV)
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+W osobnym terminalu, zostaw uruchomione w tle:
 
-## Security Vulnerabilities
+```bash
+./vendor/bin/sail artisan horizon
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Panel Horizon jest dostępny pod `http://localhost/horizon`. Stan usług można sprawdzić poleceniem:
 
-## License
+```bash
+./vendor/bin/sail ps
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-# TaskManager
+Podczas pracy nad frontendem zamiast produkcyjnego buildu można uruchomić:
+
+```bash
+./vendor/bin/sail npm run dev
+```
+
+## Testy i jakość
+
+Wszystkie testy backendu uruchamia jedna komenda:
+
+```bash
+./vendor/bin/sail test
+```
+
+Frontend i typy weryfikuje:
+
+```bash
+./vendor/bin/sail npm run build
+```
+
+Testy obejmują czystą logikę domenową, wszystkie dozwolone i odrzucone przejścia statusów, CRUD i izolację danych użytkowników, filtrowanie, import poprawny/niepoprawny/częściowo udany oraz wyniki polecenia CLI.
+
+## Import CSV
+
+Plik musi być zapisany jako CSV z separatorem średnikowym, wszystko umieszczone w cudzysłowiach i dokładnie takimi nagłówkami:
+
+```bash
+"title";"description";"priority";"due_date"
+```
+
+- `title` — wymagany, maks. 255 znaków
+- `description` — opcjonalny
+- `due_date` — opcjonalna data w formacie `YYYY-MM-DD`
+- `priority` — `low`, `medium`, `high` albo `urgent`
+
+Przykład znajduje się w [`storage/app/examples/tasks.csv`](examples/tasks-import-example.csv). Po wysłaniu pliku powstaje rekord importu, a proces trafia do kolejki Redis. Horizon przetwarza każdy wiersz niezależnie. Błędny wiersz nie wycofuje poprawnych: raport pokazuje numer wiersza, przekazane dane, wynik i dokładny powód odrzucenia. Widok wyniku odświeża dane bez przeładowania całej strony.
+
+## Przepływ statusów
+
+- Każde ręcznie tworzone zadanie zaczyna jako `todo`, dzięki czemu nie można ominąć procesu.
+- `todo -> in_progress`: praca faktycznie się rozpoczęła.
+- `in_progress -> blocked`: pojawiła się przeszkoda; `blocked -> in_progress` oznacza jej usunięcie.
+- `in_progress -> done`: zadanie można zakończyć tylko po rozpoczęciu pracy.
+- `done` jest stanem końcowym. Cofnięcie wymagałoby osobnej decyzji biznesowej (np. zdarzenia „reopen”), dlatego nie jest ukryte w zwykłej zmianie statusu.
+- `todo -> cancelled`, `in_progress -> cancelled`, `blocked -> cancelled`: zadanie może przejść w końcową fazę anulowania, gdy postanowiono porzucić dane zadania. Cofnięcie wymagałoby osobnej decyzji biznesowej (np. zdarzenia „reopen”), dlatego nie jest ukryte w zwykłej zmianie statusu.
+
+Reguły egzekwuje niezależnie od frameworka. Niepoprawne przejście zgłasza typowany błąd domenowy `InvalidTaskStatusTransitionException`.
+
+## Polecenie CLI
+
+Usunięcie zadań utworzonych dawniej niż podana liczba dni:
+
+```bash
+./vendor/bin/sail artisan tasks:prune 30
+```
+
+Komenda odrzuca wartości ujemne i wypisuje dokładną liczbę usuniętych rekordów. Operacja również przechodzi przez Command i dedykowany Handler.
+
+## Architektura i decyzje
+
+Kod zapisujący dane stosuje CQRS: kontrolery i Job tworzą obiekty z `app/Application/**/Commands`, a każda komenda ma jeden Handler. Odczyt przechodzi przez `Queries` i `QueryHandlers`. Rozdział jest celowy: import, HTTP i CLI korzystają z tych samych przypadków użycia bez powielania reguł, a kontrolery ograniczają się do transportu.
+
+Warstwa `app/Domain/Task` zawiera logikę domenową: statusy, priorytety, modele, wyjątki i zdarzenia. Eloquent, transakcje i integracja z Laravel są obsługiwane na zewnątrz domeny, w warstwie aplikacyjnej i infrastrukturze. `TaskData` z `spatie/laravel-data` stanowi typowaną granicę między zwalidowanym wejściem a komendami.
+
+Istotne działania emitują zdarzenia `TaskCreated`, `TaskDeleted`, `TaskStatusChanged`, `TaskUpdated`, `TasksImported` i `TasksPruned`. Listener zapisuje je strukturalnie do logu.
+
+Import CSV jest odporny na retry. Wcześniej przetworzone wiersze są pomijane. Błędy danych dotyczą pojedynczych wierszy, a błędy struktury pliku są raportowane jako odrzucony wynik importu.
+
+Frontend jest ułożony według Atomic Design w `resources/js/Components`: `Atoms`, `Molecules`, `Organisms`. Hooki:
+
+- `useTaskFilter` zarządza filtrem i częściową nawigacją Inertia bez przeładowania strony.
+- `useTaskStatusChange` zarządza zmianą statusu zadania z optymistyczną aktualizacją interfejsu oraz obsługą błędów i stanu oczekiwania bez przeładowania strony.
+- `useImportPooling` monitoruje status importu poprzez cykliczne odświeżanie danych Inertia bez przeładowania strony i zatrzymuje odpytywanie po zakończeniu importu.

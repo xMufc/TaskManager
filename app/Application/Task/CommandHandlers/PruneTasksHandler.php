@@ -3,14 +3,17 @@
 namespace App\Application\Task\CommandHandlers;
 
 use App\Application\Task\Commands\PruneTasksCommand;
+use App\Domain\Task\Events\TasksPruned;
 use App\Domain\Task\Repositories\TaskRepository;
 use DateTimeImmutable;
+use Illuminate\Contracts\Events\Dispatcher;
 use InvalidArgumentException;
 
 final class PruneTasksHandler
 {
     public function __construct(
         private readonly TaskRepository $tasks,
+        private readonly Dispatcher $events,
     ) {}
 
     public function handle(PruneTasksCommand $command): int
@@ -21,6 +24,15 @@ final class PruneTasksHandler
 
         $threshold = (new DateTimeImmutable)->modify("-{$command->olderThanDays} days");
 
-        return $this->tasks->deleteCreatedBefore($threshold);
+        $deletedCount = $this->tasks->deleteCreatedBefore($threshold);
+
+        $this->events->dispatch(
+            new TasksPruned(
+                deletedCount: $deletedCount,
+                threshold: $threshold,
+            )
+        );
+
+        return $deletedCount;
     }
 }
