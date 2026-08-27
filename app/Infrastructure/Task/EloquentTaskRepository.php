@@ -2,10 +2,11 @@
 
 namespace App\Infrastructure\Task;
 
-use App\Domain\Task\Repositories\TaskRepository;
 use App\Domain\Task\Enums\TaskStatus;
 use App\Domain\Task\Models\Task as DomainTask;
+use App\Domain\Task\Repositories\TaskRepository;
 use App\Models\Task as EloquentTask;
+use DateTimeImmutable;
 
 final class EloquentTaskRepository implements TaskRepository
 {
@@ -61,7 +62,17 @@ final class EloquentTaskRepository implements TaskRepository
             description: $model->description,
             status: $model->status,
             priority: $model->priority,
-            dueDate: $model->due_date?->toDateTimeImmutable(),
+            dueDate: $model->due_date
+                ? new DateTimeImmutable((string) $model->due_date)
+                : null,
+            createdAt: $model->created_at->toDateTimeImmutable()
         );
+    }
+
+    public function deleteCreatedBefore(DateTimeImmutable $threshold): int
+    {
+        return EloquentTask::query()
+            ->where('created_at', '<', $threshold)
+            ->delete();
     }
 }

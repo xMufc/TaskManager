@@ -2,9 +2,10 @@
 
 namespace Tests\Unit\Application\Task;
 
-use App\Domain\Task\Repositories\TaskRepository;
 use App\Domain\Task\Enums\TaskStatus;
 use App\Domain\Task\Models\Task;
+use App\Domain\Task\Repositories\TaskRepository;
+use DateTimeImmutable;
 
 final class InMemoryTaskRepository implements TaskRepository
 {
@@ -33,5 +34,19 @@ final class InMemoryTaskRepository implements TaskRepository
             $this->tasks,
             fn (Task $t) => $t->userId === $userId && ($status === null || $t->status === $status),
         ));
+    }
+
+    public function deleteCreatedBefore(DateTimeImmutable $threshold): int
+    {
+        $toDelete = array_filter(
+            $this->tasks,
+            fn (Task $t) => $t->createdAt < $threshold,
+        );
+
+        foreach ($toDelete as $id => $task) {
+            unset($this->tasks[$id]);
+        }
+
+        return count($toDelete);
     }
 }
