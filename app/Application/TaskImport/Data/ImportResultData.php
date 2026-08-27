@@ -13,8 +13,7 @@ final class ImportResultData extends Data
         public readonly int $acceptedCount,
         public readonly int $rejectedCount,
         public readonly string $createdAt,
-    ) {
-    }
+    ) {}
 
     public static function fromModel(ImportResult $import): self
     {

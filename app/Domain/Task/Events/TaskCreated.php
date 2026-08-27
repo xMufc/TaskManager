@@ -8,6 +8,5 @@ final class TaskCreated
 {
     public function __construct(
         public readonly Task $task,
-    ) {
-    }
+    ) {}
 }

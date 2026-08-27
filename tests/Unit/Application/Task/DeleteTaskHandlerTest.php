@@ -12,7 +12,7 @@ use Mockery;
 use Tests\Unit\Application\Task\InMemoryTaskRepository;
 
 it('deletes an existing task and dispatches TaskDeleted', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $task = new Task(
         id: 'task-1',
         userId: 'user-1',
@@ -41,7 +41,7 @@ it('deletes an existing task and dispatches TaskDeleted', function () {
 });
 
 it('throws an exception and does not dispatch an event when task does not exist', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $events = Mockery::mock(Dispatcher::class);
     $events->shouldReceive('dispatch')->never();
 
@@ -54,7 +54,7 @@ it('throws an exception and does not dispatch an event when task does not exist'
 });
 
 it('does not delete or dispatch an event for a task belonging to another user', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $task = new Task(
         id: 'task-1',
         userId: 'user-1',

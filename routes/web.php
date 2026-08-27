@@ -1,14 +1,12 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\TaskImportController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\TaskImportController;
-
-
 
 Route::get('/', function () {
     if (Auth::check()) {
@@ -26,7 +24,6 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return redirect()->route('tasks.index');
 })->middleware(['auth', 'verified'])->name('dashboard');
-
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

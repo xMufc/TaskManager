@@ -15,10 +15,10 @@ final class ImportRowResult
         public readonly ?TaskPriority $priority,
         public readonly ?DateTimeImmutable $dueDate,
         public readonly ?string $reason,
-    ) {
-    }
+    ) {}
 
-    public static function accepted(int $row, string $title, ?string $description, TaskPriority $priority, ?DateTimeImmutable $dueDate): self {
+    public static function accepted(int $row, string $title, ?string $description, TaskPriority $priority, ?DateTimeImmutable $dueDate): self
+    {
         return new self(
             row: $row,
             accepted: true,
@@ -30,7 +30,8 @@ final class ImportRowResult
         );
     }
 
-    public static function rejected(int $row, string $reason): self {
+    public static function rejected(int $row, string $reason): self
+    {
         return new self(
             row: $row,
             accepted: false,

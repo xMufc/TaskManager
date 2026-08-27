@@ -13,6 +13,5 @@ final class CreateTaskCommand
         public readonly ?string $description,
         public readonly TaskPriority $priority,
         public readonly ?DateTimeImmutable $dueDate,
-    ) {
-    }
+    ) {}
 }

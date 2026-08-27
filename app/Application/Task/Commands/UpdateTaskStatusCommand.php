@@ -10,6 +10,5 @@ final class UpdateTaskStatusCommand
         public readonly string $taskId,
         public readonly string $userId,
         public readonly TaskStatus $newStatus,
-    ) {
-    }
+    ) {}
 }

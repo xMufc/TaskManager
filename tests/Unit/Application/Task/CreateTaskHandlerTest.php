@@ -1,25 +1,26 @@
 <?php
 
-use App\Application\Task\Commands\CreateTaskCommand;
 use App\Application\Task\CommandHandlers\CreateTaskHandler;
+use App\Application\Task\Commands\CreateTaskCommand;
 use App\Domain\Task\Enums\TaskPriority;
 use App\Domain\Task\Enums\TaskStatus;
 use App\Domain\Task\Events\TaskCreated;
-use Tests\Unit\Application\Task\InMemoryTaskRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Mockery;
+use Tests\Unit\Application\Task\InMemoryTaskRepository;
 
 it('creates a task with Todo status regardless of input', function () {
-    $repository = new InMemoryTaskRepository();
-    
+    $repository = new InMemoryTaskRepository;
+
     $events = Mockery::mock(Dispatcher::class);
     $events->shouldReceive('dispatch')
         ->once()
         ->withArgs(function (TaskCreated $event) {
             expect($event->task->status)->toBe(TaskStatus::Todo);
+
             return true;
         });
-    
+
     $handler = new CreateTaskHandler($repository, $events);
 
     $task = $handler->handle(new CreateTaskCommand(
@@ -36,10 +37,10 @@ it('creates a task with Todo status regardless of input', function () {
 });
 
 it('persists the task in the repository', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $events = Mockery::mock(Dispatcher::class);
     $events->shouldReceive('dispatch')->once();
-    
+
     $handler = new CreateTaskHandler($repository, $events);
 
     $task = $handler->handle(new CreateTaskCommand(
@@ -54,10 +55,10 @@ it('persists the task in the repository', function () {
 });
 
 it('generates a unique id for each created task', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $events = Mockery::mock(Dispatcher::class);
     $events->shouldReceive('dispatch')->twice();
-    
+
     $handler = new CreateTaskHandler($repository, $events);
 
     $task1 = $handler->handle(new CreateTaskCommand('user-1', 'Clean the house', null, TaskPriority::Low, null));
@@ -67,7 +68,7 @@ it('generates a unique id for each created task', function () {
 });
 
 it('creates a task with all command data', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $events = Mockery::mock(Dispatcher::class);
 
     $events->shouldReceive('dispatch')->once();
@@ -92,7 +93,7 @@ it('creates a task with all command data', function () {
     expect($task->status)->toBe(TaskStatus::Todo);
 });
 it('creates a task without description', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $events = Mockery::mock(Dispatcher::class);
 
     $events->shouldReceive('dispatch')->once();

@@ -8,7 +8,7 @@ use App\Domain\Task\Models\Task;
 use Tests\Unit\Application\Task\InMemoryTaskRepository;
 
 it('deletes tasks older than the given number of days', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
 
     $oldTask = new Task(
         id: 'old-task',
@@ -47,7 +47,7 @@ it('deletes tasks older than the given number of days', function () {
 });
 
 it('deletes multiple tasks older than the given number of days', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
 
     $tasks = [
         new Task(
@@ -99,7 +99,7 @@ it('deletes multiple tasks older than the given number of days', function () {
 });
 
 it('does not delete tasks newer than the threshold', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
 
     $task = new Task(
         id: 'recent-task',
@@ -125,7 +125,7 @@ it('does not delete tasks newer than the threshold', function () {
 });
 
 it('throws an exception when olderThanDays is zero', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $handler = new PruneTasksHandler($repository);
 
     expect(fn () => $handler->handle(new PruneTasksCommand(
@@ -137,7 +137,7 @@ it('throws an exception when olderThanDays is zero', function () {
 });
 
 it('throws an exception when olderThanDays is negative', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $handler = new PruneTasksHandler($repository);
 
     expect(fn () => $handler->handle(new PruneTasksCommand(

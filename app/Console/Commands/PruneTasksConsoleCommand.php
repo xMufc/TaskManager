@@ -21,6 +21,7 @@ class PruneTasksConsoleCommand extends Command
             $deletedCount = $handler->handle(new PruneTasksCommand($days));
         } catch (InvalidArgumentException $e) {
             $this->error($e->getMessage());
+
             return self::FAILURE;
         }
 

@@ -9,6 +9,5 @@ final class ListTasksQuery
     public function __construct(
         public readonly string $userId,
         public readonly ?TaskStatus $status = null,
-    ) {
-    }
+    ) {}
 }

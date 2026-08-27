@@ -27,10 +27,10 @@ final class ImportTasksJob implements ShouldQueue
         public readonly string $importResultId,
         public readonly int $userId,
         public readonly string $filePath,
-    ) {
-    }
+    ) {}
 
-    public function handle(CsvTaskImporter $importer,CreateTaskHandler $createTaskHandler): void {
+    public function handle(CsvTaskImporter $importer, CreateTaskHandler $createTaskHandler): void
+    {
         try {
             $csvContent = Storage::get($this->filePath);
 
@@ -56,7 +56,7 @@ final class ImportTasksJob implements ShouldQueue
                         'title' => $result->title,
                     ];
                 } catch (Throwable $exception) {
-                    $rejected[] = ImportRowResult::rejected($result->row, 'Błąd zapisu: ' . $exception->getMessage());
+                    $rejected[] = ImportRowResult::rejected($result->row, 'Błąd zapisu: '.$exception->getMessage());
                 }
             }
 
@@ -64,7 +64,6 @@ final class ImportTasksJob implements ShouldQueue
                 'row' => $result->row,
                 'reason' => $result->reason,
             ], $rejected);
-
 
             $importResult = ImportResult::findOrFail($this->importResultId);
 

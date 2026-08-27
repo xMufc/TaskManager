@@ -23,6 +23,5 @@ final class UpdateTaskData extends Data
 
         #[Nullable]
         public readonly ?string $dueDate,
-    ) {
-    }
+    ) {}
 }

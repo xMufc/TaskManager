@@ -9,6 +9,5 @@ final class TaskImportCompleted
         public readonly string $userId,
         public readonly int $acceptedCount,
         public readonly int $rejectedCount,
-    ) {
-    }
+    ) {}
 }

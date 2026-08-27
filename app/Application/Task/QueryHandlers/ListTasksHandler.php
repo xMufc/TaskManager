@@ -2,16 +2,14 @@
 
 namespace App\Application\Task\QueryHandlers;
 
-use App\Domain\Task\Repositories\TaskRepository;
-use App\Domain\Task\Models\Task;
 use App\Application\Task\Queries\ListTasksQuery;
+use App\Domain\Task\Repositories\TaskRepository;
 
 final class ListTasksHandler
 {
     public function __construct(
         private readonly TaskRepository $tasks,
-    ) {
-    }
+    ) {}
 
     public function handle(ListTasksQuery $query): array
     {

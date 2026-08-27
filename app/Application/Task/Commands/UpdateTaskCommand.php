@@ -14,6 +14,5 @@ final class UpdateTaskCommand
         public readonly ?string $description,
         public readonly TaskPriority $priority,
         public readonly ?DateTimeImmutable $dueDate,
-    ) {
-    }
+    ) {}
 }

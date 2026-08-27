@@ -17,8 +17,7 @@ final class TaskData extends Data
         public readonly TaskPriority $priority,
         public readonly ?string $dueDate,
         public readonly array $allowedNextStatuses,
-    ) {
-    }
+    ) {}
 
     public static function fromDomain(Task $task): self
     {

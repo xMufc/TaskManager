@@ -16,7 +16,6 @@ final class Task
         public readonly TaskStatus $status,
         public readonly TaskPriority $priority,
         public readonly ?DateTimeImmutable $dueDate,
-        public readonly DateTimeImmutable $createdAt = new DateTimeImmutable(),
-    ) {
-    }
+        public readonly DateTimeImmutable $createdAt = new DateTimeImmutable,
+    ) {}
 }

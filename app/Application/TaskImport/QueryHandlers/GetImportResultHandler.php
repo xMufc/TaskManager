@@ -16,7 +16,7 @@ final class GetImportResultHandler
             ->first();
 
         if ($importResult === null) {
-            throw (new ModelNotFoundException())
+            throw (new ModelNotFoundException)
                 ->setModel(ImportResult::class, [$query->importId]);
         }
 

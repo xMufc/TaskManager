@@ -9,7 +9,6 @@ use Illuminate\Support\Collection;
 
 final class ListImportsHandler
 {
-
     public function handle(ListImportsQuery $query): Collection
     {
         return ImportResult::query()
@@ -17,8 +16,7 @@ final class ListImportsHandler
             ->latest()
             ->get()
             ->map(
-                static fn (ImportResult $import): ImportResultData =>
-                    ImportResultData::fromModel($import),
+                static fn (ImportResult $import): ImportResultData => ImportResultData::fromModel($import),
             );
     }
 }

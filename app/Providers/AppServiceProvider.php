@@ -2,20 +2,21 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Vite;
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Event;
 use App\Domain\Task\Events\TaskCreated;
-use App\Domain\Task\Events\TaskStatusChanged;
-use App\Domain\Task\Events\TaskUpdated;
 use App\Domain\Task\Events\TaskDeleted;
 use App\Domain\Task\Events\TaskImportCompleted;
+use App\Domain\Task\Events\TaskStatusChanged;
+use App\Domain\Task\Events\TaskUpdated;
 use App\Domain\Task\Listeners\LogTaskCreated;
-use App\Domain\Task\Listeners\LogTaskStatusChanged;
-use App\Domain\Task\Listeners\LogTaskUpdated;
 use App\Domain\Task\Listeners\LogTaskDeleted;
 use App\Domain\Task\Listeners\LogTaskImportCompleted;
-
+use App\Domain\Task\Listeners\LogTaskStatusChanged;
+use App\Domain\Task\Listeners\LogTaskUpdated;
+use App\Domain\Task\Repositories\TaskRepository;
+use App\Infrastructure\Task\EloquentTaskRepository;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,9 +26,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-        \App\Domain\Task\Repositories\TaskRepository::class,
-        \App\Infrastructure\Task\EloquentTaskRepository::class,
-    );
+            TaskRepository::class,
+            EloquentTaskRepository::class,
+        );
     }
 
     /**

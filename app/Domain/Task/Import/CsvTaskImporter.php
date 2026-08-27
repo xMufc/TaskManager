@@ -12,7 +12,8 @@ final class CsvTaskImporter
         'priority',
     ];
 
-    public function import(string $csvContent): ImportSummary {
+    public function import(string $csvContent): ImportSummary
+    {
         if (trim($csvContent) === '') {
             return new ImportSummary([]);
         }
@@ -20,14 +21,14 @@ final class CsvTaskImporter
 
         if ($stream === false) {
             return new ImportSummary([
-                ImportRowResult::rejected(1, 'Nie udało się otworzyć danych CSV.',),
+                ImportRowResult::rejected(1, 'Nie udało się otworzyć danych CSV.'),
             ]);
         }
 
         fwrite($stream, $csvContent);
         rewind($stream);
 
-        $header = fgetcsv($stream,0,';','"','\\',);
+        $header = fgetcsv($stream, 0, ';', '"', '\\');
 
         if ($header === false) {
             fclose($stream);
@@ -38,7 +39,7 @@ final class CsvTaskImporter
         $header = array_map(static fn ($value): string => trim((string) $value), $header);
 
         foreach (self::REQUIRED_HEADERS as $required) {
-            if (!in_array($required, $header, true)) {
+            if (! in_array($required, $header, true)) {
                 fclose($stream);
 
                 return new ImportSummary([
@@ -50,13 +51,12 @@ final class CsvTaskImporter
         $results = [];
         $rowNumber = 1;
 
-        while (($row = fgetcsv($stream, 0, ';','"', '\\',)) !== false) {
+        while (($row = fgetcsv($stream, 0, ';', '"', '\\')) !== false) {
             $rowNumber++;
 
-        if (count(array_filter($row, static fn ($value): bool => trim((string) $value) !== '')) === 0) {
-            continue;
-        }
-
+            if (count(array_filter($row, static fn ($value): bool => trim((string) $value) !== '')) === 0) {
+                continue;
+            }
 
             $results[] = $this->processRow($header, $row, $rowNumber);
         }
@@ -66,7 +66,8 @@ final class CsvTaskImporter
         return new ImportSummary($results);
     }
 
-    private function processRow(array $header, array $row, int $rowNumber): ImportRowResult {
+    private function processRow(array $header, array $row, int $rowNumber): ImportRowResult
+    {
         if (count($header) !== count($row)) {
             return ImportRowResult::rejected(
                 $rowNumber,
@@ -77,7 +78,7 @@ final class CsvTaskImporter
         $data = array_combine($header, $row);
 
         foreach (self::REQUIRED_HEADERS as $required) {
-            if (!array_key_exists($required, $data) || trim((string) $data[$required]) === '') {
+            if (! array_key_exists($required, $data) || trim((string) $data[$required]) === '') {
                 $label = match ($required) {
                     'title' => 'tytuł',
                     'priority' => 'priorytet',
@@ -107,7 +108,7 @@ final class CsvTaskImporter
         if ($priority === null) {
             $allowed = implode(', ', array_map(static fn (TaskPriority $case): string => $case->value, TaskPriority::cases()));
 
-            return ImportRowResult::rejected($rowNumber, "Nieprawidłowy priorytet. Dozwolone: {$allowed}.",);
+            return ImportRowResult::rejected($rowNumber, "Nieprawidłowy priorytet. Dozwolone: {$allowed}.");
         }
 
         $description = null;
@@ -121,12 +122,12 @@ final class CsvTaskImporter
         if (array_key_exists('due_date', $data) && trim((string) $data['due_date']) !== '') {
             $dateString = trim((string) $data['due_date']);
 
-            $dueDate = DateTimeImmutable::createFromFormat('!Y-m-d', $dateString,);
+            $dueDate = DateTimeImmutable::createFromFormat('!Y-m-d', $dateString);
 
             $dateErrors = DateTimeImmutable::getLastErrors();
 
             if ($dueDate === false || (is_array($dateErrors) && ($dateErrors['warning_count'] > 0 || $dateErrors['error_count'] > 0))) {
-                return ImportRowResult::rejected($rowNumber, 'Nieprawidłowy format daty (oczekiwano YYYY-MM-DD).',);
+                return ImportRowResult::rejected($rowNumber, 'Nieprawidłowy format daty (oczekiwano YYYY-MM-DD).');
             }
         }
 

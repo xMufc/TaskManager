@@ -9,6 +9,5 @@ final class TaskUpdated
     public function __construct(
         public readonly Task $oldTask,
         public readonly Task $newTask,
-    ) {
-    }
+    ) {}
 }

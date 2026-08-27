@@ -5,15 +5,15 @@ use App\Domain\Task\Import\CsvTaskImporter;
 
 function makeImporter(): CsvTaskImporter
 {
-    return new CsvTaskImporter();
+    return new CsvTaskImporter;
 }
 
 it('imports all valid rows successfully', function () {
     $importer = makeImporter();
 
     $csv = "title;description;priority;due_date\n"
-        . "Zadanie A;Opis A;high;2026-09-01\n"
-        . "Zadanie B;;medium;\n";
+        ."Zadanie A;Opis A;high;2026-09-01\n"
+        ."Zadanie B;;medium;\n";
 
     $summary = $importer->import($csv);
 
@@ -38,9 +38,9 @@ it('rejects invalid rows and reports reasons', function () {
     $importer = makeImporter();
 
     $csv = "title;description;priority;due_date\n"
-        . ";Opis;high;2026-09-01\n"
-        . "Zadanie;;invalid;2026-09-01\n"
-        . "Zadanie;;medium;not-a-date\n";
+        .";Opis;high;2026-09-01\n"
+        ."Zadanie;;invalid;2026-09-01\n"
+        ."Zadanie;;medium;not-a-date\n";
 
     $summary = $importer->import($csv);
 
@@ -56,10 +56,10 @@ it('handles partial success', function () {
     $importer = makeImporter();
 
     $csv = "title;description;priority;due_date\n"
-        . "Dobre zadanie;Opis;high;2026-09-01\n"
-        . ";Brak tytułu;medium;2026-09-01\n"
-        . "Kolejne dobre;;low;\n"
-        . "Złe;;invalid;2026-09-01\n";
+        ."Dobre zadanie;Opis;high;2026-09-01\n"
+        .";Brak tytułu;medium;2026-09-01\n"
+        ."Kolejne dobre;;low;\n"
+        ."Złe;;invalid;2026-09-01\n";
 
     $summary = $importer->import($csv);
 
@@ -77,10 +77,10 @@ it('reports correct row numbers and ignores empty rows', function () {
     $importer = makeImporter();
 
     $csv = "title;description;priority;due_date\n"
-        . "Zadanie;;medium;\n"
-        . ";;;\n"
-        . "\n"
-        . "Drugie zadanie;;high;\n";
+        ."Zadanie;;medium;\n"
+        .";;;\n"
+        ."\n"
+        ."Drugie zadanie;;high;\n";
 
     $summary = $importer->import($csv);
 
@@ -95,7 +95,7 @@ it('rejects rows with invalid structure', function () {
     $importer = makeImporter();
 
     $csv = "title;description;priority;due_date\n"
-        . "Zadanie;Opis;medium\n";
+        ."Zadanie;Opis;medium\n";
 
     $summary = $importer->import($csv);
 
@@ -109,7 +109,7 @@ it('rejects CSV without required headers', function () {
     $importer = makeImporter();
 
     $csv = "description;priority;due_date\n"
-        . "Opis;high;2026-09-01\n";
+        ."Opis;high;2026-09-01\n";
 
     $summary = $importer->import($csv);
 
@@ -125,7 +125,7 @@ it('rejects title longer than 255 characters', function () {
 
     $summary = $importer->import(
         "title;description;priority;due_date\n"
-        . "{$title};;medium;\n",
+        ."{$title};;medium;\n",
     );
 
     expect($summary->accepted())->toHaveCount(0);
@@ -137,9 +137,9 @@ it('rejects invalid date formats', function () {
     $importer = makeImporter();
 
     $csv = "title;description;priority;due_date\n"
-        . "Zadanie;;medium;2026-04-31\n"
-        . "Zadanie;;medium;2026-09-01 12:00:00\n"
-        . "Zadanie;;medium;01-09-2026\n";
+        ."Zadanie;;medium;2026-04-31\n"
+        ."Zadanie;;medium;2026-09-01 12:00:00\n"
+        ."Zadanie;;medium;01-09-2026\n";
 
     $summary = $importer->import($csv);
 

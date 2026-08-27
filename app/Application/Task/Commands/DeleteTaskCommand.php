@@ -7,6 +7,5 @@ final class DeleteTaskCommand
     public function __construct(
         public readonly string $taskId,
         public readonly string $userId,
-    ) {
-    }
+    ) {}
 }

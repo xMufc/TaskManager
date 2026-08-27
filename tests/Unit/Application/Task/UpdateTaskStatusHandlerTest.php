@@ -1,15 +1,16 @@
 <?php
 
-use App\Application\Task\Commands\UpdateTaskStatusCommand;
 use App\Application\Task\CommandHandlers\UpdateTaskStatusHandler;
+use App\Application\Task\Commands\UpdateTaskStatusCommand;
 use App\Domain\Task\Enums\TaskPriority;
 use App\Domain\Task\Enums\TaskStatus;
 use App\Domain\Task\Events\TaskStatusChanged;
 use App\Domain\Task\Exceptions\InvalidTaskStatusTransitionException;
+use App\Domain\Task\Exceptions\TaskNotFoundException;
 use App\Domain\Task\Models\Task;
-use Tests\Unit\Application\Task\InMemoryTaskRepository;
 use Illuminate\Contracts\Events\Dispatcher;
 use Mockery;
+use Tests\Unit\Application\Task\InMemoryTaskRepository;
 
 function makeTask(TaskStatus $status = TaskStatus::Todo): Task
 {
@@ -25,7 +26,7 @@ function makeTask(TaskStatus $status = TaskStatus::Todo): Task
 }
 
 it('changes status when transition is allowed', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $repository->save(makeTask(TaskStatus::Todo));
 
     $events = Mockery::mock(Dispatcher::class);
@@ -48,7 +49,7 @@ it('changes status when transition is allowed', function () {
 });
 
 it('throws when transition is not allowed', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $repository->save(makeTask(TaskStatus::Done));
 
     $events = Mockery::mock(Dispatcher::class);
@@ -66,7 +67,7 @@ it('throws when transition is not allowed', function () {
 });
 
 it('throws not found when task belongs to another user', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $repository->save(makeTask(TaskStatus::Todo));
 
     $events = Mockery::mock(Dispatcher::class);
@@ -78,5 +79,5 @@ it('throws not found when task belongs to another user', function () {
         taskId: 'task-1',
         userId: 'someone-else',
         newStatus: TaskStatus::InProgress,
-    )))->toThrow(\App\Domain\Task\Exceptions\TaskNotFoundException::class);
+    )))->toThrow(TaskNotFoundException::class);
 });

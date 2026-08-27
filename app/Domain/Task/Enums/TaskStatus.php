@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Domain\Task\Enums;
+
 use App\Domain\Task\Exceptions\InvalidTaskStatusTransitionException;
 
 enum TaskStatus: string

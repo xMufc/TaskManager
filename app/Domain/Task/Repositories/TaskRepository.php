@@ -15,6 +15,6 @@ interface TaskRepository
     public function delete(string $id, string $userId): void;
 
     public function allForUser(string $userId, ?TaskStatus $status = null): array;
-    public function deleteCreatedBefore(DateTimeImmutable $threshold): int;
 
+    public function deleteCreatedBefore(DateTimeImmutable $threshold): int;
 }

@@ -12,6 +12,5 @@ final class UpdateTaskStatusData extends Data
     public function __construct(
         #[Required, Enum(TaskStatus::class)]
         public readonly TaskStatus $status,
-    ) {
-    }
+    ) {}
 }

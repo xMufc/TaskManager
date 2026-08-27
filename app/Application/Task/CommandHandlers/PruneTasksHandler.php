@@ -11,8 +11,7 @@ final class PruneTasksHandler
 {
     public function __construct(
         private readonly TaskRepository $tasks,
-    ) {
-    }
+    ) {}
 
     public function handle(PruneTasksCommand $command): int
     {
@@ -20,7 +19,7 @@ final class PruneTasksHandler
             throw new InvalidArgumentException('Liczba dni musi być liczbą dodatnią.');
         }
 
-        $threshold = (new DateTimeImmutable())->modify("-{$command->olderThanDays} days");
+        $threshold = (new DateTimeImmutable)->modify("-{$command->olderThanDays} days");
 
         return $this->tasks->deleteCreatedBefore($threshold);
     }

@@ -25,7 +25,7 @@ function makeUpdateTask(): Task
 }
 
 it('updates task data', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $task = makeUpdateTask();
 
     $repository->save($task);
@@ -59,7 +59,7 @@ it('updates task data', function () {
 });
 
 it('preserves task identity and status', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $task = makeUpdateTask();
 
     $repository->save($task);
@@ -84,7 +84,7 @@ it('preserves task identity and status', function () {
 });
 
 it('dispatches TaskUpdated with old and new task', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $task = makeUpdateTask();
 
     $repository->save($task);
@@ -112,7 +112,7 @@ it('dispatches TaskUpdated with old and new task', function () {
 });
 
 it('throws not found when task does not exist', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
 
     $events = Mockery::mock(Dispatcher::class);
     $events->shouldReceive('dispatch')->never();
@@ -130,7 +130,7 @@ it('throws not found when task does not exist', function () {
 });
 
 it('throws not found when task belongs to another user', function () {
-    $repository = new InMemoryTaskRepository();
+    $repository = new InMemoryTaskRepository;
     $repository->save(makeUpdateTask());
 
     $events = Mockery::mock(Dispatcher::class);

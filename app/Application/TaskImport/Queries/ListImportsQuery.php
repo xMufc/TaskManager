@@ -6,6 +6,5 @@ final readonly class ListImportsQuery
 {
     public function __construct(
         public int $userId,
-    ) {
-    }
+    ) {}
 }

@@ -8,8 +8,7 @@ use App\Domain\Task\Models\Task;
 final class TaskStatusChanged
 {
     public function __construct(
-        public readonly Task $task,          
+        public readonly Task $task,
         public readonly TaskStatus $previousStatus,
-    ) {
-    }
+    ) {}
 }
