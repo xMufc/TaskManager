@@ -1,4 +1,4 @@
-## TaskManager
+# TaskManager
 
 Aplikacja do zarządzania zadaniami i asynchronicznego importu CSV, przygotowana w Laravel 13, React 18, TypeScript i Inertia. Środowisko uruchomieniowe zapewnia Laravel Sail (PHP 8.5, MySQL 8.4, Redis), a kolejkę importów obsługuje Laravel Horizon.
 
@@ -116,3 +116,10 @@ Usunięcie zadań utworzonych dawniej niż podana liczba dni:
 
 Komenda odrzuca wartości ujemne i wypisuje dokładną liczbę usuniętych rekordów. Operacja również przechodzi przez Command i dedykowany Handler.
 
+## Źródła
+
+- https://kamilkozak.dev/blog/architektura-warstwowa-w-laravelu#warstwy
+- https://zawarstwaabstrakcji.pl/20170130-cqrs-w-praktyce-wprowadzenie-php/
+- https://bulldogjob.pl/readme/cqrs-i-event-sourcing-czyli-latwa-droga-do-skalowalnosci-naszych-systemow
+- https://dev.to/blamsa0mine/building-a-scalable-laravel-application-with-ddd-and-cqrs-architecture-28b1#project-structure
+- https://atomicdesign.bradfrost.com/chapter-2/

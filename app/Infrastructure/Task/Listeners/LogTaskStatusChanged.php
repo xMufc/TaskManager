@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Domain\Task\Listeners;
+namespace App\Infrastructure\Task\Listeners;
 
 use App\Domain\Task\Events\TaskStatusChanged;
 use Illuminate\Support\Facades\Log;
